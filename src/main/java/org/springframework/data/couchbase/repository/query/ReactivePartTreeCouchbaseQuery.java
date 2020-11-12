@@ -30,6 +30,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 /**
  * Reactive PartTree {@link RepositoryQuery} implementation for Couchbase.
+ * Replaces ReactivePartN1qlBasedQuery
  *
  * @author Michael Reiche
  * @since 4.1 

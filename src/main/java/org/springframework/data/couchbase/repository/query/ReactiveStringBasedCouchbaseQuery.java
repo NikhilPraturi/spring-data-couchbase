@@ -36,9 +36,6 @@ public class ReactiveStringBasedCouchbaseQuery extends AbstractReactiveCouchbase
 
 	private static final String COUNT_EXISTS_AND_DELETE = "Manually defined query for %s cannot be a count and exists or delete query at the same time!";
 	private static final Logger LOG = LoggerFactory.getLogger(ReactiveStringBasedCouchbaseQuery.class);
-	private final boolean isCountQuery;
-	private final boolean isExistsQuery;
-	private final boolean isDeleteQuery;
 	private final NamedQueries namedQueries;
 
 	private final SpelExpressionParser expressionParser;
@@ -65,11 +62,7 @@ public class ReactiveStringBasedCouchbaseQuery extends AbstractReactiveCouchbase
 		this.expressionParser = expressionParser;
 		this.evaluationContextProvider = evaluationContextProvider;
 
-		this.isCountQuery = method.isCountQuery();
-		this.isExistsQuery = method.isExistsQuery();
-		this.isDeleteQuery = method.isDeleteQuery();
-
-		if (hasAmbiguousProjectionFlags(this.isCountQuery, this.isExistsQuery, this.isDeleteQuery)) {
+		if (hasAmbiguousProjectionFlags(isCountQuery(), isExistsQuery(), isDeleteQuery())) {
 			throw new IllegalArgumentException(String.format(COUNT_EXISTS_AND_DELETE, method));
 		}
 
@@ -84,17 +77,21 @@ public class ReactiveStringBasedCouchbaseQuery extends AbstractReactiveCouchbase
 	@Override
 	protected Query createQuery(ParametersParameterAccessor accessor) {
 
-		// StringN1qlQueryCreator creator = new StringN1qlQueryCreator( accessor, getQueryMethod());
 		StringN1qlQueryCreator creator = new StringN1qlQueryCreator(accessor, getQueryMethod(),
 				getOperations().getConverter(), getOperations().getBucketName(), expressionParser, evaluationContextProvider,
 				namedQueries);
 		Query query = creator.createQuery();
 
 		if (LOG.isDebugEnabled()) {
-			LOG.debug(String.format("Created query %s for * fields.", query.export() /*, query.getFieldsObject()*/));
+			LOG.debug(String.format("Created query " + query.export()));
 		}
 
 		return query;
+	}
+
+	@Override
+	protected Query createCountQuery(ParametersParameterAccessor accessor) {
+		return /*applyQueryMetaAttributesWhenPresent*/(createQuery(accessor)); // not yet implemented
 	}
 
 	/*
@@ -103,13 +100,7 @@ public class ReactiveStringBasedCouchbaseQuery extends AbstractReactiveCouchbase
 	 */
 	@Override
 	protected boolean isLimiting() {
-		// TODO
-		return false;
-	}
-
-	private static boolean hasAmbiguousProjectionFlags(boolean isCountQuery, boolean isExistsQuery,
-			boolean isDeleteQuery) {
-		return BooleanUtil.countBooleanTrueValues(isCountQuery, isExistsQuery, isDeleteQuery) > 1;
+		return false; // not yet implemented
 	}
 
 }

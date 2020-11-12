@@ -31,6 +31,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 /**
  * {@link RepositoryQuery} implementation for Couchbase.
+ * Replaces PartTreeN1qlBasedQuery
  *
  * @author Michael Reiche
  * @since 4.1
@@ -38,7 +39,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 public class PartTreeCouchbaseQuery extends AbstractCouchbaseQuery {
 
 	private final PartTree tree;
-	// private final boolean isGeoNearQuery;
 	private final MappingContext<?, CouchbasePersistentProperty> context;
 	private final ResultProcessor processor;
 	private final CouchbaseConverter converter;
@@ -57,6 +57,7 @@ public class PartTreeCouchbaseQuery extends AbstractCouchbaseQuery {
 		super(method, operations, expressionParser, evaluationContextProvider);
 
 		this.processor = method.getResultProcessor();
+		// @dashl - I don't know the purpose of this for(), it was in the code I copied
 		for (PartTree.OrPart parts : this.tree = new PartTree(method.getName(),
 				processor.getReturnedType().getDomainType())) {}
 
